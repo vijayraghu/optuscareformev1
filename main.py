@@ -39,7 +39,7 @@ def start():
 	resp = VoiceResponse()
 	if (end <= timestamp >= start):
 		# If call time not within hours of operation, play appropriate prompt and transfer to general line
-		values = {"text": 'Our office hours are from 08:30 AM till 18:00 PM on weekdays. Kindly hold while we transfer your call to our general assistance line and a customer service representative will assist you'}
+		values = {"text": 'Hi! The Care For me team is currently closed, the team is opened from 8:30 till 6 P M weekdays. Please hold and I’ll transfer your call to the General Customer Service Number.'}
 		print 'In start: before Google TTS'
 		resp.play(hostname + 'goog_text2speech?' + qs)
 		print 'In start: after Google TTS'
@@ -111,7 +111,7 @@ def process_speech():
 	
 	if (confidence >= 0.0):
 		# Step 1: Call Dialogflow for intent analysis
-		intent_name, output_text, product_name, emp_id, intent_stage = apiai_text_to_intent(apiai_client_access_key, input_text, user_id, apiai_language)
+		intent_name, output_text, product_name, emp_id = apiai_text_to_intent(apiai_client_access_key, input_text, user_id, apiai_language)
 		
 		# Step 2: Speech input processing by Twilio
 		values = {'prior_text': output_text}
@@ -130,14 +130,14 @@ def process_speech():
 			resp.dial('+61280490603')
 			resp.redirect('/process_close')
 			
-		# Transfer for default fallback intent
+		# Transfer for default fallback intent (*******To Check with Chris*******)
 		if intent_name == 'Default Fallback Intent':
 			print 'reached default intent. Transfering...'
 			resp.dial('+61280490603')
 			resp.redirect('/process_close')
 		
 		# Perform employee number validation
-		if intent_name == 'get_employee_number_cartwright_yes':
+		if intent_name == 'get_employee_number_cartwright':
 			#Validate employee number
 			if (str(emp_id)[:2]) != '10':
 				resp.dial('+61280490603')
@@ -223,12 +223,8 @@ def apiai_text_to_intent(apiapi_client_access_key, input_text, user_id, language
 		output_text = output['result']['fulfillment']['speech']
 	except:
 		output_text = ""
-	try:
-		intent_stage = output['result']['contexts']
-    	except:
-		intent_stage = "unknown"
-    	
-	return intent_name, output_text, product_name, emp_id, intent_stage
+	    	
+	return intent_name, output_text, product_name, emp_id
 
 # Get route point based on Intent and product#
 def getroutepoint(intent_name, product_name):
@@ -314,36 +310,33 @@ def processRequest(req):
 	resp = VoiceResponse()
 	
 	# Process employee number
-	if intentname == 'get_employee_number_cartwright_yes':
+	if intentname == 'get_employee_number_cartwright':
 		#Validate employee number
 		if (str(emp_id)[:2]) != '10':
-			speech = 'This is not a valid employee number. Kindly hold on while we connect you to one of our customer service agent'
+			speech = 'Hmmm! That does not seem to be a valid employee number. Let me transfer you to one of my colleagues in the General Customer Service Team that can help you with your inquiry today.'
 		else:
-			speech = 'Thanks for providing your employee number. How can we help you today?'
-	
-	# Get employee number again if user informs that employee id interpretation is incorrect
-	elif intentname == 'get_employee_number_cartwright_no':
-		speech = 'Please provide your employee number by speaking each digit individually'
+			employee_name = get_employee_name(emp_id)
+			speech = 'Thanks ' + employee_name + ' for providing your employee number. Now how can we help you today?'
 	
     	# Transfer for Billing_services
     	elif intentname == 'billing_services_cartwright':
-		speech = 'Kindly hold on while we connect you to one of our customer service agent'
+		speech = 'Ok. Let me transfer you to one of my colleagues that can help you with your Billing inquiry'
 	
     	# Transfer for Sales_services   
     	elif intentname == 'sales_services_cartwright':
-		speech = 'Kindly hold on while we connect you to one of our customer service agent'
+		speech = 'Ok. Let me transfer you to one of my colleagues that can help you with your Sales inquiry'
 	
     	# Transfer for Tech_services
     	elif intentname == 'tech_services_cartwright':
-		speech = 'Kindly hold on while we connect you to one of our customer service agent'
+		speech = 'Ok. Let me transfer you to one of my colleagues that can help you with your technical inquiry'
 			
     	# Transfer to General services if employee number is not provided
     	elif intentname == 'no_employee_number_cartwright':
-		speech = 'Kindly hold on while we connect you to one of our customer service agent'
+		speech = 'Let me transfer you to one of my colleagues in the General Customer Service Team that can help you with your inquiry today'
 		
 	# Catch all error/exception scenarios and transfer to General services
 	else:
-		speech = 'Kindly hold on while we connect you to one of our customer service agent'
+		speech = 'Let me transfer you to one of my colleagues in the General Customer Service Team that can help you with your inquiry today'
 	
 	return {'speech': speech, 'displayText': speech, 
 		'source': 'careforyou'
@@ -351,17 +344,32 @@ def processRequest(req):
 	return res
 
 #####
+##### Helper function for employee name
+#####
+def get_employee_name(emp_id):
+	if emp_id = '1048350':
+		employee_name = 'Chris'
+	elif emp_id = '1048550':
+		employee_name = 'Mick'
+	elif emp_id = '1048550':
+		employee_name = 'Josh'
+	elif emp_id = '1058670':
+		employee_name = 'Paul'
+	elif emp_id = '1088430':
+		employee_name = 'Cameron'
+	else:
+		employee_name = ''
+		
+	return employee_name
+
+#####
 ##### Google Cloud Text to speech for Speech Synthesis
 ##### This function calls Google TTS and then streams out the output media in mp3 format
 #####
 @app.route('/goog_text2speech', methods=['GET', 'POST'])
 def goog_text2speech():
-	text = request.args.get('text', "Hello! Invalid request. Please provide the TEXT value")
-	
-	# Pre-process the text 
-	if len(text) == 0:
-		text = "We are experiencing technical difficulties at the moment. Please call back later."
-	
+	text = request.args.get('text', "Oh No! There seems to be something wrong with my ram. Can you try calling back a little later after i talk to my friends in IT")
+
 	# Adding space between numbers for better synthesis
 	if re.search(r'\b\d{1,16}\b', text):
 		text = re.sub('(?<=\d)(?=\d)', ' ', text)

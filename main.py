@@ -306,6 +306,7 @@ def processRequest(req):
 	parameters = result.get('parameters')
 	actionname = parameters.get('action')
 	emp_id = parameters.get('employee_id')
+	print emp_id
 	product_name = parameters.get('optus_product')
 	resp = VoiceResponse()
 	
@@ -347,6 +348,7 @@ def processRequest(req):
 ##### Helper function for employee name
 #####
 def get_employee_name(emp_id):
+	print employee number validated
 	if emp_id == '1048350':
 		employee_name = 'Chris'
 	elif emp_id == '1048550':

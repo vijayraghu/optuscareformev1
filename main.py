@@ -28,7 +28,7 @@ app = Flask(__name__)
 def start():
 	caller_phone_number = request.values.get('From')
 	user_id = request.values.get('CallSid')
-	twilio_asr_language = request.values.get('twilio_asr_language', 'en-AU')
+	twilio_asr_language = request.values.get('twilio_asr_language', 'en-IN')
 	apiai_language = request.values.get('apiai_language', 'en')
 	hostname = request.url_root
 	
@@ -131,10 +131,10 @@ def process_speech():
 			resp.redirect('/process_close')
 			
 		# Transfer for default fallback intent (*******To Check with Chris*******)
-		if intent_name == 'Default Fallback Intent':
-			print 'reached default intent. Transfering...'
-			resp.dial('+61280490603')
-			resp.redirect('/process_close')
+		#if intent_name == 'Default Fallback Intent':
+			#print 'reached default intent. Transfering...'
+			#resp.dial('+61280490603')
+			#resp.redirect('/process_close')
 		
 		# Perform employee number validation
 		if intent_name == 'get_employee_number_cartwright':
@@ -310,6 +310,21 @@ def processRequest(req):
 	product_name = parameters.get('optus_product')
 	resp = VoiceResponse()
 	
+	# Handle Default Fallback Intent
+	if intentname == 'Default Fallback Intent':
+		print 'Intent :' + intentname
+		context = result.get('outputContexts')
+		if "parameters" in context[0]:
+			con_emp_id = context[0]['parameters']['employee_id.original']
+			print con_emp_id
+			if str(con_emp_id) != '':
+				print 'I am here'
+				fulfillmentText = 'I am having difficulties understanding what you said. My apologies. You can say billing inquiry, sales inquiry or technical inquiry to proceed or else say exit to get transferred to a colleague in the General Customer Service Team' 
+			else:
+				fulfillmentText = 'I am having difficulties understanding what you said. My apologies. Please provide your employee number by speaking each digit individually to proceed or else say exit to get transfered to a colleague in the General Customer Service Team'
+		else:
+			fulfillmentText = 'I am having difficulties understanding what you said. My apologies. Please provide your employee number by speaking each digit individually to proceed or else say exit to get transfered to a colleague in the General Customer Service Team'
+	
 	# Process employee number
 	if intentname == 'get_employee_number_cartwright':
 		#Validate employee number
@@ -339,25 +354,25 @@ def processRequest(req):
 	else:
 		speech = 'Let me transfer you to one of my colleagues in the General Customer Service Team that can help you with your inquiry today'
 	
-	return {'speech': speech, 'displayText': speech, 
-		'source': 'careforyou'
+	return {'speech': speech, 'displayText': speech, 'source': 'careformev1'
 	       }
 	return res
 
-#####
-##### Helper function for employee name
-#####
+	#####
+	##### Helper function for employee name
+	#####
 def get_employee_name(emp_id):
-	print 'employee number validated'
-	if emp_id == 1048350:
+	print 'Inside Get employee name'
+	print emp_id
+	if str(int(emp_id)) == '1048350':
 		employee_name = 'Chris'
-	elif emp_id == 1048550:
+	elif str(int(emp_id)) == '1048550':
 		employee_name = 'Mick'
-	elif emp_id == 1048550:
+	elif str(int(emp_id)) == '1048550':
 		employee_name = 'Josh'
-	elif emp_id == 1058670:
+	elif str(int(emp_id)) == '1058670':
 		employee_name = 'Paul'
-	elif emp_id == 1088430:
+	elif str(int(emp_id)) == '1088430':
 		employee_name = 'Cameron'
 	else:
 		employee_name = ''
@@ -372,10 +387,14 @@ def get_employee_name(emp_id):
 def goog_text2speech():
 	text = request.args.get('text', "Oh No! There seems to be something wrong with my ram. Can you try calling back a little later after i talk to my friends in IT")
 
+	# Pre-process the text 
+	#if len(text) == 0:
+		#text = "We are experiencing technical difficulties at the moment. Please call back later."
+	
 	# Adding space between numbers for better synthesis
-	if re.search(r'\b\d{1,16}\b', text):
-		text = re.sub('(?<=\d)(?=\d)', ' ', text)
-		print "Changed input: " + text
+	#if re.search(r'\b\d{1,16}\b', text):
+		#text = re.sub('(?<=\d)(?=\d)', ' ', text)
+		#print "Changed input: " + text
 	
 	# Setting profile id
 	effects_profile_id = 'telephony-class-application'

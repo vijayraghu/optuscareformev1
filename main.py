@@ -313,7 +313,7 @@ def processRequest(req):
 	# Handle Default Fallback Intent
 	if intentname == 'Default Fallback Intent':
 		print 'Intent :' + intentname
-		context = result.get('outputContexts')
+		context = result.get('contexts')
 		if "parameters" in context[0]:
 			con_emp_id = context[0]['parameters']['employee_id.original']
 			print con_emp_id

@@ -351,8 +351,8 @@ def processRequest(req):
 		speech = 'Let me transfer you to one of my colleagues in the General Customer Service Team that can help you with your inquiry today'
 		
 	# Catch all error/exception scenarios and transfer to General services
-	else:
-		speech = 'Let me transfer you to one of my colleagues in the General Customer Service Team that can help you with your inquiry today'
+	#else:
+		#speech = 'Let me transfer you to one of my colleagues in the General Customer Service Team that can help you with your inquiry today'
 	
 	return {'speech': speech, 'displayText': speech, 'source': 'careformev1'
 	       }

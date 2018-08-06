@@ -95,7 +95,7 @@ def start():
 def process_speech():
 	caller_phone_number = request.values.get('From')
 	user_id = request.values.get('CallSid')
-	twilio_asr_language = request.values.get('twilio_asr_language', 'en-AU')
+	twilio_asr_language = request.values.get('twilio_asr_language', 'en-IN')
 	apiai_language = request.values.get('apiai_language', 'en')
 	prior_text = request.values.get('prior_text', 'Prior text missing')
 	input_text = request.values.get('SpeechResult', '')
@@ -370,7 +370,7 @@ def get_employee_name(emp_id):
 		employee_name = 'Chris'
 	elif str(int(emp_id)) == '1048550':
 		employee_name = 'Mick'
-	elif str(int(emp_id)) == '1048550':
+	elif str(int(emp_id)) == '1048560':
 		employee_name = 'Josh'
 	elif str(int(emp_id)) == '1058670':
 		employee_name = 'Paul'

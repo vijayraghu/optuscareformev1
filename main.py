@@ -28,7 +28,7 @@ app = Flask(__name__)
 def start():
 	caller_phone_number = request.values.get('From')
 	user_id = request.values.get('CallSid')
-	twilio_asr_language = request.values.get('twilio_asr_language', 'en-IN')
+	twilio_asr_language = request.values.get('twilio_asr_language', 'en-AU')
 	apiai_language = request.values.get('apiai_language', 'en')
 	hostname = request.url_root
 	
@@ -95,7 +95,7 @@ def start():
 def process_speech():
 	caller_phone_number = request.values.get('From')
 	user_id = request.values.get('CallSid')
-	twilio_asr_language = request.values.get('twilio_asr_language', 'en-IN')
+	twilio_asr_language = request.values.get('twilio_asr_language', 'en-AU')
 	apiai_language = request.values.get('apiai_language', 'en')
 	prior_text = request.values.get('prior_text', 'Prior text missing')
 	input_text = request.values.get('SpeechResult', '')

@@ -321,11 +321,11 @@ def processRequest(req):
 			print con_emp_id
 			if str(con_emp_id) != '':
 				print 'I am here'
-				speech = 'I am having difficulties understanding what you said. My apologies. You can say billing inquiry, sales inquiry or technical inquiry to proceed or else say exit to get transferred to a colleague in the General Customer Service Team' 
+				speech = 'I not sure I quite understand. Apologies!. I’m new here at Optus and still in training and learning about all our product lines, maybe if you could tell me the general reason for your call today like Billing or Sales or perhaps it’s technical. If you are not sure, please say exit.' 
 			else:
-				speech = 'I am having difficulties understanding what you said. My apologies. Please provide your employee number by speaking each digit individually to proceed or else say exit to get transfered to a colleague in the General Customer Service Team'
+				speech = 'I not sure I quite understand. Apologies. If you could just tell me your employee number speaking every digit individually, i can help you. If you dont have an employee number, thats fine. Just say you dont have it or say exit.'
 		else:
-			speech = 'I am having difficulties understanding what you said. My apologies. Please provide your employee number by speaking each digit individually to proceed or else say exit to get transfered to a colleague in the General Customer Service Team'
+			speech = 'I not sure I quite understand. Apologies. If you could just tell me your employee number speaking every digit individually, i can help you. If you dont have an employee number, thats fine. Just say you dont have it or say exit.'
 	
 	# Process employee number
 	if intentname == 'get_employee_number_cartwright':

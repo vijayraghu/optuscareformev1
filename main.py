@@ -223,6 +223,7 @@ def apiai_text_to_intent(apiapi_client_access_key, input_text, user_id, language
 		emp_id= ""	
 	try:
 		output_text = output['result']['fulfillment']['speech']
+		output_text = output_text.encode('utf-8')
 	except:
 		output_text = ""
 	    	

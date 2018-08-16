@@ -229,7 +229,7 @@ def processRequest(req):
 	# Handle Default Fallback Intent
 	if intentname in ['Default Fallback Intent', 'application_services_cartwright-no', 'infra_services_cartwright-no', 'voice_services_cartwright-no']:
 		print 'Intent :' + intentname
-		speech = 'I not sure I quite understand. Apologies!. I’m new here at Optus and still in training and learning about how to help you. Maybe if you could tell me the general reason for your call today like phone or application or perhaps infra.'
+		speech = 'I may have misunderstood. Apologies!. I’m new here at Optus and still in training and learning about how to help you. Maybe if you could tell me the general reason for your call today like phone or fax or application or perhaps infra.'
 	
     	# Log ticket message upon positive confirmation
     	if intentname in ['application_services_cartwright-yes', 'voice_services_cartwright-yes', 'infra_services_cartwright-yes']:

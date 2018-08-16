@@ -124,19 +124,6 @@ def process_speech():
 		gather.play(hostname + 'goog_text2speech?' + qs1)
 		print 'In progress: After Google tts'
 		resp.append(gather)
-		
-		Transfer for default fallback intent (*******To Check with Chris*******)
-		if intent_name == 'Default Fallback Intent':
-			print 'reached default intent. Transfering...'
-			resp.dial('+61280490603')
-			resp.redirect('/process_close')
-	
-		# Transfer to routepoint based in intent and product	
-		print 'Intent :' + intent_name
-		if intent_name != '' and category != '':
-			phone_number = getroutepoint(intent_name, product_name)
-			resp.dial(phone_number)
-			resp.redirect('/process_close')
 			
 		# If gather is missing (no speech input), redirect to process incomplete speech via Dialogflow
 		values = {'prior_text': output_text, 
@@ -213,25 +200,6 @@ def apiai_text_to_intent(apiapi_client_access_key, input_text, user_id, language
 	    	
 	return intent_name, output_text, category, dealer_code
 
-# Get route point based on Intent and product#
-def getroutepoint(intent_name, product_name):
-	#Catch all exceptions
-	phone_number = "+61450178418"
-	
-	# Transfer for Voice_services
-    	if intent_name == 'voice_services_cartwright':
-		phone_number = "+61421183854"
-						
-	# Transfer for Application_services
-    	if intent_name == 'application_services_cartwright':
-		phone_number = "+61447628852"
-
-	# Transfer for Infra_services
-	if intent_name == 'infra_services_cartwright':
-		phone_number = "+61421183854"
-		
-	return phone_number
-
 #####
 ##### Dialogflow fulfillment webhook
 #####
@@ -259,54 +227,18 @@ def processRequest(req):
 	resp = VoiceResponse()
 	
 	# Handle Default Fallback Intent
-	if intentname == 'Default Fallback Intent':
+	if intentname in ['Default Fallback Intent', 'application_services_cartwright-no', 'infra_services_cartwright-no', 'voice_services_cartwright-no']:
 		print 'Intent :' + intentname
-		speech = 'I not sure I quite understand. Apologies!. I’m new here at Optus and still in training and learning about how to help you. Maybe if you could tell me the general reason for your call today like phone or application or perhaps infra. If you are not sure, please say exit.'
+		speech = 'I not sure I quite understand. Apologies!. I’m new here at Optus and still in training and learning about how to help you. Maybe if you could tell me the general reason for your call today like phone or application or perhaps infra.'
 	
-    	# Transfer for Voice_services
-    	if intentname == 'voice_services_cartwright':
-		speech = 'Ok. Let me transfer you to one of my colleagues that can help you with your Voice inquiry'
-	
-    	# Transfer for Sales_services   
-    	elif intentname == 'sales_services_cartwright':
-		speech = 'Ok. Let me transfer you to one of my colleagues that can help you with your Sales inquiry'
-	
-    	# Transfer for Tech_services
-    	elif intentname == 'tech_services_cartwright':
-		speech = 'Ok. Let me transfer you to one of my colleagues that can help you with your technical inquiry'
-			
-    	# Transfer to General services if employee number is not provided
-    	elif intentname == 'no_employee_number_cartwright':
-		speech = 'Let me transfer you to one of my colleagues in the General Customer Service Team that can help you with your inquiry today'
-		
-	# Catch all error/exception scenarios and transfer to General services
-	#else:
-		#speech = 'Let me transfer you to one of my colleagues in the General Customer Service Team that can help you with your inquiry today'
+    	# Log ticket message upon positive confirmation
+    	if intentname in ['application_services_cartwright-yes', 'voice_services_cartwright-yes', 'infra_services_cartwright-yes']:
+		print 'Intent :' + intentname
+		speech = 'Ok. I will log a ticket on your behalf and have a colleague from IT call you back shortly to sort this out'
 	
 	return {'speech': speech, 'displayText': speech, 'source': 'careformev1'
 	       }
 	return res
-
-	#####
-	##### Helper function for employee name
-	#####
-def get_employee_name(emp_id):
-	print 'Inside Get employee name'
-	print emp_id
-	if str(int(emp_id)) == '1048350':
-		employee_name = 'Chris'
-	elif str(int(emp_id)) == '1048550':
-		employee_name = 'Mick'
-	elif str(int(emp_id)) == '1048560':
-		employee_name = 'Josh'
-	elif str(int(emp_id)) == '1058670':
-		employee_name = 'Paul'
-	elif str(int(emp_id)) == '1088430':
-		employee_name = 'Cameron'
-	else:
-		employee_name = ''
-		
-	return employee_name
 
 #####
 ##### Google Cloud Text to speech for Speech Synthesis
@@ -316,15 +248,6 @@ def get_employee_name(emp_id):
 def goog_text2speech():
 	text = request.args.get('text', "Oh No! There seems to be something wrong with my ram. Can you try calling back a little later after i talk to my friends in IT")
 
-	# Pre-process the text 
-	#if len(text) == 0:
-		#text = "We are experiencing technical difficulties at the moment. Please call back later."
-	
-	# Adding space between numbers for better synthesis
-	#if re.search(r'\b\d{1,16}\b', text):
-		#text = re.sub('(?<=\d)(?=\d)', ' ', text)
-		#print "Changed input: " + text
-	
 	# Setting profile id
 	effects_profile_id = 'telephony-class-application'
 	

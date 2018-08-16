@@ -20,7 +20,7 @@ apiai_url = "https://api.api.ai/v1/query"
 apiai_querystring = {"v": "20150910"}
 
 # Setup hints for better speech recognition
-hints = "1,2,3,4,5,6,7,8,9,0, 1 one first, 2 two second, 3 three third, 4 four fourth, 5 five fifth, 6 six sixth, 7 seven seventh, 8 eight eighth,9 nine ninth, 10 ten tenth, 0 zero o, account acount akount, mobile, roaming, top up topup,channels channel,tv TV, broadband broad band, fetch, extension, iphone, cable, recharge, recharging, optus Optus, Hey, EPL, English premier league, streaming, premier league"
+hints = "1,2,3,4,5,6,7,8,9,0, 1 one first, 2 two second, 3 three third, 4 four fourth, 5 five fifth, 6 six sixth, 7 seven seventh, 8 eight eighth,9 nine ninth, 10 ten tenth, 0 zero o, light. lights, application, outlook, fax, phone, phones, PC, system, store, infra, rebooting"
 
 app = Flask(__name__)
 
@@ -39,7 +39,7 @@ def start():
 	resp = VoiceResponse()
 	if (end <= timestamp >= start):
 		# If call time not within hours of operation, play appropriate prompt and transfer to general line
-		values = {"text": 'Hi! The Care For me team is currently closed, the team is opened from 8:30 till 6 P M weekdays. Please hold and I’ll transfer your call to the General Customer Service Number.'}
+		values = {"text": 'Hi! The store helpline team is currently closed, the team is opened from 8:30 till 6 P M weekdays. Please hold and I’ll transfer your call to the General Customer Service Number.'}
 		print 'In start: before Google TTS'
 		resp.play(hostname + 'goog_text2speech?' + qs)
 		print 'In start: after Google TTS'
@@ -111,7 +111,7 @@ def process_speech():
 	
 	if (confidence >= 0.0):
 		# Step 1: Call Dialogflow for intent analysis
-		intent_name, output_text, product_name, emp_id = apiai_text_to_intent(apiai_client_access_key, input_text, user_id, apiai_language)
+		intent_name, output_text, category, dealer_code = apiai_text_to_intent(apiai_client_access_key, input_text, user_id, apiai_language)
 		
 		# Step 2: Speech input processing by Twilio
 		values = {'prior_text': output_text}
@@ -125,34 +125,18 @@ def process_speech():
 		print 'In progress: After Google tts'
 		resp.append(gather)
 		
-		# Transfer to General services if employee number is not provided
-    		if intent_name == 'no_employee_number_cartwright':
-			resp.dial('+61450178418')
+		Transfer for default fallback intent (*******To Check with Chris*******)
+		if intent_name == 'Default Fallback Intent':
+			print 'reached default intent. Transfering...'
+			resp.dial('+61280490603')
 			resp.redirect('/process_close')
-			
-		# Transfer for default fallback intent (*******To Check with Chris*******)
-		#if intent_name == 'Default Fallback Intent':
-			#print 'reached default intent. Transfering...'
-			#resp.dial('+61280490603')
-			#resp.redirect('/process_close')
-		
-		# Perform employee number validation
-		if intent_name == 'get_employee_number_cartwright':
-			#Validate employee number
-			if (str(emp_id)[:2]) != '10':
-				resp.dial('+61450178418')
-				resp.redirect('/process_close')
-		
+	
 		# Transfer to routepoint based in intent and product	
 		print 'Intent :' + intent_name
-		if intent_name != '' and product_name != '':
-			if (str(int(emp_id))[:2]) != '10':
-				resp.dial('+61450178418')
-				resp.redirect('/process_close')
-			else:
-				phone_number = getroutepoint(intent_name, product_name)
-				resp.dial(phone_number)
-				resp.redirect('/process_close')
+		if intent_name != '' and category != '':
+			phone_number = getroutepoint(intent_name, product_name)
+			resp.dial(phone_number)
+			resp.redirect('/process_close')
 			
 		# If gather is missing (no speech input), redirect to process incomplete speech via Dialogflow
 		values = {'prior_text': output_text, 
@@ -212,79 +196,40 @@ def apiai_text_to_intent(apiapi_client_access_key, input_text, user_id, language
 	try:
 		intent_name = output['result']['metadata']['intentName']
 	except:
-		intent_name= ""
+		intent_name = ""
 	try:
-		product_name = output['result']['parameters']['optus_product']
+		category = output['result']['parameters']['category']
 	except:
-		product_name= ""
+		category = ""
 	try:
-		emp_id = output['result']['parameters']['employee_id']
+		dealer_code = output['result']['parameters']['dealer_code']
 	except:
-		emp_id= ""	
+		dealer_code= ""	
 	try:
 		output_text = output['result']['fulfillment']['speech']
 		output_text = output_text.encode('utf-8')
 	except:
 		output_text = ""
 	    	
-	return intent_name, output_text, product_name, emp_id
+	return intent_name, output_text, category, dealer_code
 
 # Get route point based on Intent and product#
 def getroutepoint(intent_name, product_name):
 	#Catch all exceptions
 	phone_number = "+61450178418"
 	
-	# Transfer for Billing_services
-    	if intent_name == 'billing_services_cartwright':
-		if product_name == 'Postpaid':
-			phone_number = "+61421183854"
-		elif product_name == 'Prepaid':
-			phone_number = "+61421183854"
-		elif product_name == 'Mobile Broadband':
-			phone_number = "+61421183854"
-		elif product_name == 'Internet':
-			phone_number = "+61421183854"
-		elif product_name == 'Telephony':
-			phone_number = "+61421183854"
-		elif product_name == 'Optus TV':
-			phone_number = "+61421183854"
-		elif product_name == 'Financial Services':
-			phone_number = "+61421183854"
-					
-	# Transfer for Sales_services
-    	if intent_name == 'sales_services_cartwright':
-		if product_name == 'Postpaid':
-			phone_number = "+61447628852"
-		elif product_name == 'Prepaid':
-			phone_number = "+61447628852"
-		elif product_name == 'Mobile Broadband':
-			phone_number = "+61447628852"
-		elif product_name == 'Internet':
-			phone_number = "+61447628852"
-		elif product_name == 'Telephony':
-			phone_number = "+61447628852"
-		elif product_name == 'Optus TV':
-			phone_number = "+61447628852"
-		elif product_name == 'Financial Services':
-			phone_number = "+61447628852"
-					
-	# Transfer for Tech_services
-	if intent_name == 'tech_services_cartwright':
-		if product_name == 'Postpaid':
-			phone_number = "+61421183854"
-		elif product_name == 'Prepaid':
-			phone_number = "+61421183854"
-		elif product_name == 'Mobile Broadband':
-			phone_number = "+61421183854"
-		elif product_name == 'Internet':
-			phone_number = "+61421183854"
-		elif product_name == 'Telephony':
-			phone_number = "+61421183854"
-		elif product_name == 'Optus TV':
-			phone_number = "+61421183854"
-		elif product_name == 'Financial Services':
-			phone_number = "+61421183854"
-	
+	# Transfer for Voice_services
+    	if intent_name == 'voice_services_cartwright':
+		phone_number = "+61421183854"
+						
+	# Transfer for Application_services
+    	if intent_name == 'application_services_cartwright':
+		phone_number = "+61447628852"
+
+	# Transfer for Infra_services
+	if intent_name == 'infra_services_cartwright':
+		phone_number = "+61421183854"
+		
 	return phone_number
 
 #####
@@ -308,9 +253,9 @@ def processRequest(req):
 	intentname = metadata.get('intentName')
 	parameters = result.get('parameters')
 	actionname = parameters.get('action')
-	emp_id = parameters.get('employee_id')
+	category = parameters.get('category')
+	dealer_code = parameters.get('dealer_code')
 	print emp_id
-	product_name = parameters.get('optus_product')
 	resp = VoiceResponse()
 	
 	# Handle Default Fallback Intent

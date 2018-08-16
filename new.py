@@ -261,30 +261,11 @@ def processRequest(req):
 	# Handle Default Fallback Intent
 	if intentname == 'Default Fallback Intent':
 		print 'Intent :' + intentname
-		context = result.get('contexts')
-		if "parameters" in context[0]:
-			con_emp_id = context[0]['parameters']['employee_id.original']
-			print con_emp_id
-			if str(con_emp_id) != '':
-				print 'I am here'
-				speech = 'I not sure I quite understand. Apologies!. I’m new here at Optus and still in training and learning about all our product lines, maybe if you could tell me the general reason for your call today like Billing or Sales or perhaps it’s technical. If you are not sure, please say exit.' 
-			else:
-				speech = 'I not sure I quite understand. Apologies. If you could just tell me your employee number speaking every digit individually, i can help you. If you dont have an employee number, thats fine. Just say you dont have it or say exit.'
-		else:
-			speech = 'I not sure I quite understand. Apologies. If you could just tell me your employee number speaking every digit individually, i can help you. If you dont have an employee number, thats fine. Just say you dont have it or say exit.'
+		speech = 'I not sure I quite understand. Apologies!. I’m new here at Optus and still in training and learning about how to help you. Maybe if you could tell me the general reason for your call today like phone or application or perhaps infra. If you are not sure, please say exit.'
 	
-	# Process employee number
-	if intentname == 'get_employee_number_cartwright':
-		#Validate employee number
-		if (str(emp_id)[:2]) != '10':
-			speech = 'Hmmm! That does not seem to be a valid employee number. Let me transfer you to one of my colleagues in the General Customer Service Team that can help you with your inquiry today.'
-		else:
-			employee_name = get_employee_name(emp_id)
-			speech = 'Thanks ' + employee_name + ' for providing your employee number. Now how can we help you today?'
-	
-    	# Transfer for Billing_services
-    	elif intentname == 'billing_services_cartwright':
-		speech = 'Ok. Let me transfer you to one of my colleagues that can help you with your Billing inquiry'
+    	# Transfer for Voice_services
+    	if intentname == 'voice_services_cartwright':
+		speech = 'Ok. Let me transfer you to one of my colleagues that can help you with your Voice inquiry'
 	
     	# Transfer for Sales_services   
     	elif intentname == 'sales_services_cartwright':

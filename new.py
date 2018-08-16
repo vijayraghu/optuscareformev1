@@ -223,7 +223,7 @@ def processRequest(req):
 	actionname = parameters.get('action')
 	category = parameters.get('category')
 	dealer_code = parameters.get('dealer_code')
-	print emp_id
+	print dealer_code, category
 	resp = VoiceResponse()
 	
 	# Handle Default Fallback Intent
